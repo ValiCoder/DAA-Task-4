@@ -1,147 +1,178 @@
-Performance Analysis
-Algorithm Characteristics
-Algorithm	Time Complexity	Space Complexity	Best For
-Tarjan's SCC	O(V + E)	O(V)	Cycle detection in dense graphs
-Kahn's Topo Sort	O(V + E)	O(V)	Sparse DAGs with queue efficiency
-DAG Critical Path	O(V + E)	O(V)	Scheduling and timeline analysis
-Key Findings
-SCC Performance:
+# Smart City Scheduling System
 
-Most efficient for cycle detection in dependency graphs
+## Technical Implementation
 
-Memory usage scales linearly with graph size
+### System Architecture
+```
+DAA-Task-4/
+├── src/main/java/smartcity/
+│   ├── graph/
+│   │   ├── scc/TarjanSCC.java        // O(V+E) cycle detection
+│   │   ├── topo/TopologicalSort.java // O(V+E) Kahn's algorithm  
+│   │   ├── dagsp/DAGShortestPath.java // O(V+E) critical path
+│   │   └── Metrics.java              // Performance instrumentation
+│   ├── model/Task.java               // Node duration model
+│   ├── generator/DatasetGenerator.java // Synthetic data generation
+│   └── Main.java                     // Pipeline execution
+├── src/test/java/smartcity/
+│   └── GraphAlgorithmsTest.java      // Validation suite
+├── data/                             // Generated datasets
+└── pom.xml                          // Build configuration
+```
 
-Handles dense cyclic structures well
+## Algorithm Specifications
 
-Topological Sort:
+### 1. Strongly Connected Components (Tarjan)
+- **Time Complexity**: O(|V| + |E|)
+- **Space Complexity**: O(|V|)
+- **Operations**: DFS visits, stack operations, low-link calculations
+- **Output**: SCC list, condensation graph DAG
 
-Kahn's algorithm provides stable O(V + E) performance
+**Implementation Details**:
+```java
+// Core operations per node
+indices[v] = index;
+lowLinks[v] = index;
+index++;
+stack.push(v);
+onStack[v] = true;
+```
 
-Automatically detects cycles (returns partial order)
+### 2. Topological Sort (Kahn)
+- **Time Complexity**: O(|V| + |E|) 
+- **Space Complexity**: O(|V|)
+- **Operations**: In-degree calculation, queue operations
+- **Output**: Valid linear ordering or cycle detection
 
-Ideal for task scheduling applications
+**Implementation Details**:
+```java
+// In-degree computation: O(E)
+for neighbors: inDegree[neighbor]++
+// Queue processing: O(V)
+while !queue.empty(): process zero-in-degree nodes
+```
 
-Critical Path:
+### 3. DAG Shortest/Longest Paths
+- **Time Complexity**: O(|V| + |E|)
+- **Space Complexity**: O(|V|)  
+- **Operations**: Edge relaxations, distance updates
+- **Output**: Critical path, shortest distances from source
 
-Essential for project timeline optimization
+## Performance Metrics
 
-Identifies bottleneck tasks that impact overall duration
+### Measured Parameters
+- **Execution Time**: System.nanoTime() precision
+- **DFS Visits**: Node traversals in SCC detection
+- **Edge Relaxations**: Distance updates in path algorithms  
+- **Queue Operations**: Enqueue/dequeue counts in topological sort
+- **Memory Usage**: Estimated from graph size and auxiliary structures
 
-Works efficiently on the condensation DAG
+### Expected Performance Ranges
 
-Testing
-Test Coverage
-SCC Detection: Simple cycles, complex graphs, empty graphs
+| Graph Size | Nodes | Edges | SCC Time (ms) | Topo Time (ms) | Critical Path (ms) |
+|------------|-------|-------|---------------|----------------|-------------------|
+| Small      | 6-10  | 15-30 | 0.1-0.5       | 0.05-0.2       | 0.05-0.2          |
+| Medium     | 10-20 | 30-80 | 0.2-1.0       | 0.1-0.5        | 0.1-0.5           |
+| Large      | 20-50 | 80-300| 0.5-3.0       | 0.3-1.5        | 0.3-1.5           |
 
-Topological Sort: DAG validation, order correctness
+## Dataset Specifications
 
-Critical Path: Length calculation, path reconstruction
+### Generation Parameters
+- **Node Count**: 6-50 vertices
+- **Edge Density**: 25-40% connectivity  
+- **Cycle Injection**: 1-5 intentional cycles per graph
+- **Duration Range**: 1-10 time units per task
 
-Edge Cases: Empty graphs, disconnected components
+### Structural Variants
+1. **Acyclic**: Pure DAG (0 cycles)
+2. **Cyclic**: 2-5 strongly connected components  
+3. **Mixed**: Hybrid structure with both cyclic and acyclic components
 
-Running Specific Tests
-bash
-# Run all algorithms through full dataset processing
+## Validation Criteria
+
+### Algorithm Correctness
+- **SCC**: All nodes partitioned, cycles correctly identified
+- **Topological Sort**: All edges respect ordering, cycle detection functional
+- **Critical Path**: Longest path correctly identified, durations summed accurately
+
+### Performance Benchmarks
+- **Time Complexity**: Linear scaling with graph size
+- **Space Usage**: Linear auxiliary storage requirements
+- **Operation Counts**: Consistent with theoretical complexity
+
+## Build & Execution
+
+### Compilation
+```bash
+mvn clean compile
+# OR
+javac -d target/classes src/main/java/smartcity/*.java src/main/java/smartcity/**/*.java
+```
+
+### Execution
+```bash
+mvn exec:java
+# OR  
 java -cp target/classes smartcity.Main
+```
 
-# Run unit tests only
+### Testing
+```bash
 java -cp target/classes smartcity.GraphAlgorithmsTest
+```
 
-# Run specific test method
-# Edit GraphAlgorithmsTest.main() to call specific tests
-Configuration
-Data Generation Parameters
-Modify DatasetGenerator.java to adjust:
+## Output Format
 
-Graph sizes (nodes)
+### Processing Results
+```
+DATASET: small_acyclic
+SCC: 5 components, sizes=[1,1,1,1,1], time=0.45ms, visits=45
+TOPO: order=[0,1,2,3,4], time=0.22ms, queue_ops=15  
+CRITICAL_PATH: length=28, path=[0,2,4], time=0.18ms, relaxations=12
+```
 
-Edge density
+### Performance Summary
+- **Total Processing Time**: Sum of all algorithm executions
+- **Memory Footprint**: Estimated from graph representation size
+- **Operation Efficiency**: Actual vs theoretical complexity ratios
 
-Cycle frequency
+## Technical Constraints
 
-Node duration ranges
+### System Requirements
+- **Java Version**: 11+ (module system compatibility)
+- **Memory**: Minimum 512MB heap for large graphs
+- **Storage**: 1MB for generated datasets
 
-Algorithm Parameters
-Metrics: Track performance counters and timing
+### Algorithm Limitations
+- **Graph Size**: Practical limit ~10,000 nodes due to recursion depth
+- **Cycle Detection**: Maximum cycle length limited by stack size
+- **Path Reconstruction**: Linear space in path length
 
-Graph Representation: Adjacency lists for efficiency
+## Error Conditions
 
-Node Durations: Configurable task execution times
+### Expected Failures
+- **File I/O**: Missing data directory, permission denied
+- **Memory**: Stack overflow for deep recursion
+- **Validation**: Invalid graph structures, negative durations
 
-Practical Applications
-City Service Scheduling
-Dependency Resolution: Use SCC to detect circular dependencies
+### Recovery Procedures
+- Automatic fallback to synthetic test graphs
+- Graceful degradation with error reporting
+- Resource cleanup on exception conditions
 
-Execution Ordering: Apply topological sort for valid task sequences
+## Extension Interfaces
 
-Timeline Optimization: Use critical path for bottleneck identification
+### Custom Implementations
+Override core algorithms while maintaining:
+- Metrics collection interface
+- Graph input/output formats
+- Result validation protocols
 
-Resource Allocation: Shortest path analysis for resource distribution
+### Integration Points
+- Alternative SCC algorithms (Kosaraju)
+- Different topological sort implementations
+- Custom pathfinding heuristics
 
-Algorithm Selection Guide
-Use Case	Recommended Algorithm	Notes
-Cycle Detection	Tarjan's SCC	Memory-efficient, handles dense graphs
-Task Scheduling	Kahn's Topological Sort	Predictable performance, cycle detection
-Timeline Analysis	DAG Critical Path	Identifies scheduling bottlenecks
-Full Pipeline	All three sequentially	SCC → Topo Sort → Critical Path
-Troubleshooting
-Common Issues
-File Not Found Errors:
+---
 
-Ensure data directory exists
-
-Check file permissions in project directory
-
-Memory Issues:
-
-For large graphs, increase JVM heap size: java -Xmx2g -cp ...
-
-Use -Xss to increase stack size for deep recursion
-
-Performance Problems:
-
-Large dense graphs may require optimized data structures
-
-Consider iterative algorithms for very large graphs
-
-Test Failures:
-
-Verify Java version compatibility (requires Java 11+)
-
-Check that all source files are in correct packages
-
-Debug Mode
-Enable debug output by modifying Main.java:
-
-java
-// Add debug flags
-boolean DEBUG = true;
-Extension Possibilities
-Visualization: Add graph visualization using JavaFX or web interfaces
-
-Real-time Updates: Implement incremental algorithms for dynamic graphs
-
-Parallel Processing: Use parallel DFS for very large graphs
-
-Constraint Satisfaction: Add resource constraints to scheduling
-
-Web Interface: Create REST API for remote graph processing
-
-Contributing
-Code Structure
-Follow Java naming conventions
-
-Add Javadoc comments for public methods
-
-Include unit tests for new functionality
-
-Maintain package structure consistency
-
-Testing Guidelines
-Write tests for all public methods
-
-Include edge cases and error conditions
-
-Use descriptive test method names
-
-Ensure tests are independent and repeatable
+*Technical documentation v1.0 - Performance-optimized graph processing system*
