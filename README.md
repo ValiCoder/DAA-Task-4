@@ -1,6 +1,6 @@
 # Smart City Scheduling System - Analysis Report
 
-## Executive Summary
+## Summary
 
 This report analyzes the performance and characteristics of three graph algorithms—Strongly Connected Components (SCC), Topological Sorting, and DAG Shortest Paths—applied to smart city task scheduling. The system processes dependency graphs representing city service tasks to detect cycles, determine execution order, and identify critical paths for optimal scheduling.
 
@@ -247,4 +247,3 @@ This report analyzes the performance and characteristics of three graph algorith
 | Large Graphs | Kahn's Topo | SCC on demand | Memory efficient |
 | Real-time | Kahn's Topo | - | Predictable performance |
 
-This analysis demonstrates that while all three algorithms have O(V + E) complexity, their practical performance and suitability vary significantly based on graph structure and application requirements. The combination of SCC detection followed by topological sorting and critical path analysis provides a comprehensive solution for smart city task scheduling optimization.
