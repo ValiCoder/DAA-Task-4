@@ -2,10 +2,6 @@ package smartcity.model;
 
 import java.util.List;
 
-/**
- * Represents a city service task with dependencies
- */
-
 public class Task {
     private int id;
     private String name;
@@ -19,7 +15,6 @@ public class Task {
         this.dependencies = dependencies;
     }
 
-    // Getters and setters
     public int getId() { return id; }
     public void setId(int id) { this.id = id; }
 

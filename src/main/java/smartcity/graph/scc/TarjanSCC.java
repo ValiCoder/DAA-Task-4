@@ -3,9 +3,7 @@ package smartcity.graph.scc;
 import smartcity.graph.Metrics;
 import java.util.*;
 
-/**
- * Implementation of Tarjan's algorithm for finding Strongly Connected Components
- */
+
 public class TarjanSCC {
     private Map<Integer, List<Integer>> graph;
     private Metrics metrics;
@@ -21,10 +19,6 @@ public class TarjanSCC {
         this.metrics = metrics;
     }
 
-    /**
-     * Find all strongly connected components in the graph
-     * @return List of SCCs, each represented as a list of vertices
-     */
     public List<List<Integer>> findSCCs() {
         int n = graph.size();
         indices = new int[n];
@@ -55,20 +49,16 @@ public class TarjanSCC {
         stack.push(v);
         onStack[v] = true;
 
-        // Consider successors of v
         for (int neighbor : graph.getOrDefault(v, new ArrayList<>())) {
             metrics.incrementDfsVisits();
             if (indices[neighbor] == -1) {
-                // Successor has not yet been visited; recurse on it
                 strongConnect(neighbor);
                 lowLinks[v] = Math.min(lowLinks[v], lowLinks[neighbor]);
             } else if (onStack[neighbor]) {
-                // Successor is in stack and hence in the current SCC
                 lowLinks[v] = Math.min(lowLinks[v], indices[neighbor]);
             }
         }
 
-        // If v is a root node, pop the stack and generate an SCC
         if (lowLinks[v] == indices[v]) {
             List<Integer> component = new ArrayList<>();
             int w;
@@ -81,28 +71,21 @@ public class TarjanSCC {
         }
     }
 
-    /**
-     * Build the condensation graph (DAG of SCCs)
-     * @return Condensation graph where nodes represent SCCs
-     */
     public Map<Integer, List<Integer>> buildCondensationGraph() {
         List<List<Integer>> sccs = findSCCs();
         Map<Integer, Integer> componentMap = new HashMap<>();
         Map<Integer, List<Integer>> condensation = new HashMap<>();
 
-        // Map each node to its component ID
         for (int compId = 0; compId < sccs.size(); compId++) {
             for (int node : sccs.get(compId)) {
                 componentMap.put(node, compId);
             }
         }
 
-        // Initialize condensation graph
         for (int i = 0; i < sccs.size(); i++) {
             condensation.put(i, new ArrayList<>());
         }
 
-        // Build edges between components
         for (Map.Entry<Integer, List<Integer>> entry : graph.entrySet()) {
             int fromNode = entry.getKey();
             int fromComp = componentMap.get(fromNode);
@@ -121,10 +104,6 @@ public class TarjanSCC {
         return condensation;
     }
 
-    /**
-     * Get SCC sizes for analysis
-     * @return List of SCC sizes
-     */
     public List<Integer> getSCCSizes() {
         List<List<Integer>> sccs = findSCCs();
         List<Integer> sizes = new ArrayList<>();

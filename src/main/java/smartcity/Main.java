@@ -14,10 +14,8 @@ public class Main {
     public static void main(String[] args) {
         System.out.println("=== Smart City Scheduling System ===\n");
 
-        // Generate datasets if they don't exist
         generateDatasets();
 
-        // Process all datasets
         processAllDatasets();
 
         System.out.println("\n=== Processing Complete ===");
@@ -46,7 +44,6 @@ public class Main {
 
     private static void processDataset(String filename) {
         try {
-            // Check if file exists
             java.io.File file = new java.io.File(filename);
             if (!file.exists()) {
                 System.out.println("   Dataset file not found: " + filename);
@@ -58,17 +55,14 @@ public class Main {
             String jsonContent = readFile(filename);
             Map<String, Object> data = parseSimpleJSON(jsonContent);
 
-            // Parse graph structure
             Map<Integer, List<Integer>> graph = parseGraph(data);
 
-            // Parse node durations
             int[] nodeDurations = parseDurations(data, graph.size());
 
             processGraph(graph, nodeDurations, filename);
 
         } catch (Exception e) {
             System.err.println("Error processing dataset " + filename + ": " + e.getMessage());
-            // Fallback to test graph
             System.out.println("   Using test graph as fallback...");
             processTestGraph();
         }
@@ -77,7 +71,6 @@ public class Main {
     private static void processGraph(Map<Integer, List<Integer>> graph, int[] nodeDurations, String datasetName) {
         Metrics metrics = new Metrics();
 
-        // 1. Find Strongly Connected Components
         System.out.println("\n1. STRONGLY CONNECTED COMPONENTS:");
         TarjanSCC tarjan = new TarjanSCC(graph, metrics);
         List<List<Integer>> sccs = tarjan.findSCCs();
@@ -91,7 +84,6 @@ public class Main {
         System.out.println("   Metrics: " + metrics);
         metrics.reset();
 
-        // 2. Build Condensation Graph and Topological Sort
         System.out.println("\n2. CONDENSATION GRAPH & TOPOLOGICAL SORT:");
         Map<Integer, List<Integer>> condensation = tarjan.buildCondensationGraph();
         TopologicalSort topo = new TopologicalSort(metrics);
@@ -102,11 +94,9 @@ public class Main {
         System.out.println("   Metrics: " + metrics);
         metrics.reset();
 
-        // 3. Critical Path Analysis
         System.out.println("\n3. CRITICAL PATH ANALYSIS:");
         DAGShortestPath dagsp = new DAGShortestPath(metrics);
 
-        // Get topological order of original graph for critical path
         List<Integer> originalTopoOrder = topo.kahnTopologicalSort(graph);
         if (originalTopoOrder.size() == graph.size()) {
             DAGShortestPath.CriticalPathResult criticalPath =
@@ -116,7 +106,6 @@ public class Main {
             System.out.println("   Critical path: " + criticalPath.path);
         } else {
             System.out.println("   Graph has cycles, using condensation for critical path");
-            // Use the first node from each component in topological order
             List<Integer> representativeOrder = new ArrayList<>();
             for (int compId : compOrder) {
                 representativeOrder.add(sccs.get(compId).get(0));
@@ -131,7 +120,6 @@ public class Main {
     }
 
     private static void processTestGraph() {
-        // Create a test graph for demonstration
         Map<Integer, List<Integer>> graph = new HashMap<>();
         graph.put(0, Arrays.asList(1, 2));
         graph.put(1, Arrays.asList(3));
@@ -157,7 +145,6 @@ public class Main {
 
     private static Map<String, Object> parseSimpleJSON(String json) {
         Map<String, Object> result = new HashMap<>();
-        // Very simple JSON parser for our specific format
         if (json.contains("\"graph\"")) {
             result.put("hasGraph", true);
         }
@@ -168,8 +155,6 @@ public class Main {
     }
 
     private static Map<Integer, List<Integer>> parseGraph(Map<String, Object> data) {
-        // For now, return a test graph
-        // In a full implementation, you would parse the actual JSON structure
         return createTestGraph();
     }
 
@@ -183,28 +168,22 @@ public class Main {
     }
 
     private static Map<Integer, List<Integer>> createTestGraph() {
-        // Create a more interesting test graph with cycles
         Map<Integer, List<Integer>> graph = new HashMap<>();
 
-        // Component 1: Linear chain
         graph.put(0, Arrays.asList(1));
         graph.put(1, Arrays.asList(2));
         graph.put(2, Arrays.asList(3));
 
-        // Component 2: Cycle
         graph.put(4, Arrays.asList(5));
         graph.put(5, Arrays.asList(6));
         graph.put(6, Arrays.asList(4)); // Cycle
 
-        // Component 3: Another linear chain
         graph.put(7, Arrays.asList(8));
         graph.put(8, Arrays.asList(9));
 
-        // Connections between components
         graph.get(3).add(4);
         graph.get(3).add(7);
 
-        // Ensure all nodes exist
         for (int i = 0; i < 10; i++) {
             graph.putIfAbsent(i, new ArrayList<>());
         }

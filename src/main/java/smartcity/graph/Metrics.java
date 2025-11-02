@@ -1,9 +1,5 @@
 package smartcity.graph;
 
-/**
- * Metrics collector for algorithm performance measurement
- */
-
 public class Metrics {
     private long startTime;
     private long endTime;
@@ -35,7 +31,6 @@ public class Metrics {
         queueOperations++;
     }
 
-    // Getters
     public int getDfsVisits() { return dfsVisits; }
     public int getEdgeRelaxations() { return edgeRelaxations; }
     public int getQueueOperations() { return queueOperations; }

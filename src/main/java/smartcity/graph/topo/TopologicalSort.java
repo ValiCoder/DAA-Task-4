@@ -24,7 +24,6 @@ public class TopologicalSort {
         int n = graph.size();
         int[] inDegree = new int[n];
 
-        // Calculate in-degrees for all nodes
         for (List<Integer> neighbors : graph.values()) {
             for (int neighbor : neighbors) {
                 inDegree[neighbor]++;
@@ -32,7 +31,6 @@ public class TopologicalSort {
             }
         }
 
-        // Initialize queue with nodes having 0 in-degree
         Queue<Integer> queue = new LinkedList<>();
         for (int i = 0; i < n; i++) {
             if (inDegree[i] == 0) {
@@ -50,7 +48,6 @@ public class TopologicalSort {
             topoOrder.add(node);
             visitedCount++;
 
-            // Process neighbors
             for (int neighbor : graph.getOrDefault(node, new ArrayList<>())) {
                 inDegree[neighbor]--;
                 if (inDegree[neighbor] == 0) {
@@ -62,7 +59,6 @@ public class TopologicalSort {
 
         metrics.stopTimer();
 
-        // Check for cycles
         if (visitedCount != n) {
             System.out.println("Warning: Graph contains cycles, topological sort may be incomplete");
         }
@@ -70,12 +66,6 @@ public class TopologicalSort {
         return topoOrder;
     }
 
-    /**
-     * Derive task order from component order after SCC compression
-     * @param componentOrder Topological order of SCCs
-     * @param sccs List of SCCs
-     * @return Flattened task order
-     */
     public List<Integer> deriveTaskOrder(List<Integer> componentOrder, List<List<Integer>> sccs) {
         List<Integer> taskOrder = new ArrayList<>();
 

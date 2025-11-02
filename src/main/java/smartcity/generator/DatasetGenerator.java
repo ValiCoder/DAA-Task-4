@@ -11,7 +11,6 @@ public class DatasetGenerator {
     public void generateAllDatasets() {
         System.out.println("Generating all datasets...");
 
-        // Create data directory if it doesn't exist
         File dataDir = new File("data");
         if (!dataDir.exists()) {
             dataDir.mkdirs();
@@ -54,7 +53,6 @@ public class DatasetGenerator {
         json.append("  \"density\": ").append(density).append(",\n");
         json.append("  \"allowCycles\": ").append(allowCycles).append(",\n");
 
-        // Generate graph
         Map<Integer, List<Integer>> graph = generateGraph(nodes, density, allowCycles, expectedCycles);
         json.append("  \"graph\": {\n");
         boolean firstNode = true;
@@ -73,7 +71,6 @@ public class DatasetGenerator {
         }
         json.append("\n  },\n");
 
-        // Generate durations
         json.append("  \"durations\": {\n");
         boolean firstDuration = true;
         for (int i = 0; i < nodes; i++) {
@@ -90,12 +87,10 @@ public class DatasetGenerator {
     private Map<Integer, List<Integer>> generateGraph(int nodes, double density, boolean allowCycles, int numCycles) {
         Map<Integer, List<Integer>> graph = new HashMap<>();
 
-        // Initialize all nodes
         for (int i = 0; i < nodes; i++) {
             graph.put(i, new ArrayList<>());
         }
 
-        // Generate random edges based on density
         for (int i = 0; i < nodes; i++) {
             for (int j = 0; j < nodes; j++) {
                 if (i != j && random.nextDouble() < density) {
@@ -104,7 +99,6 @@ public class DatasetGenerator {
             }
         }
 
-        // Add cycles if allowed
         if (allowCycles && nodes >= 3) {
             addCycles(graph, nodes, numCycles);
         }
@@ -125,7 +119,6 @@ public class DatasetGenerator {
             List<Integer> nodeList = new ArrayList<>(cycleNodes);
             Collections.shuffle(nodeList, random);
 
-            // Create the cycle
             for (int i = 0; i < nodeList.size(); i++) {
                 int from = nodeList.get(i);
                 int to = nodeList.get((i + 1) % nodeList.size());
